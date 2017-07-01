@@ -114,6 +114,10 @@ EVM中的每个操作被分配给一定数量的消耗gas的数目。gasUsed是�
 #### 其他的挖矿选项
 请访问[geth](https://github.com/ethereum/go-ethereum/wiki/Command-Line-Options)和[Parity](https://github.com/paritytech/parity/wiki/Configuring-Parity#cli-options)的CLI选项页面，就可以看到矿工可以设置的所有的选项列表，以此来优化的调整自己的设置。
 ## 资源和深入阅读
-
-
-
+* [Eth Gas Station website with Ethereum gas and miner stats](http://ethgasstation.info/)
+* [Ethereum StackExchange for technical questions of all kinds](https://ethereum.stackexchange.com/).
+* [EthDocs Ethereum Documentation (Much of it is outdated, but still good)](http://ethdocs.org/en/latest/).
+* [“Ethereum Gas, Fuel and Fees” by Joseph Chow](https://media.consensys.net/ethereum-gas-fuel-and-fees-3333e17fe1dc).
+* [“What is Gas?” by MyEtherWallet](https://myetherwallet.groovehq.com/knowledge_base/topics/what-is-gas).
+* [MyEtherWallet Ether unit conversion tool](https://www.myetherwallet.com/helpers.html).
+* [“When there are too many pending transactions” by Infura](https://blog.infura.io/when-there-are-too-many-pending-transactions-8ec1a88bc87e).
