@@ -59,4 +59,21 @@ EVM中的每个操作被分配给一定数量的消耗gas的数目。gasUsed是�
 #### gasPrise
 一个使用者构造并签名了一个交易，并且每个使用者可能指定任意的他们想要的gasPrise，可能为零。但是，以太坊客户端推出的前沿(Frontier)有一个默认的0.05e12的<font color=red>gasPrise</font>。由于矿工会优化他们的收入，如果大部分的交易都以默认的0.05e12 wei的<font color=red>gasPrise</font>提交，就会很难说服矿工接受制定较低或者零的gasPrise的交易。
 #### 交易成本的例子
-*得到许可，我现在借这个例子并从一个很棒的MyEtherWallet团队中分析*
+*得到许可的情况下，我现在借这个例子并从一个很棒的叫做MyEtherWallet的团队做了类比，[请点击这里访问他们关于gas写的很好的一个指南](https://myetherwallet.groovehq.com/knowledge_base/topics/what-is-gas)，他们还有个[很棒的实用程序页面，你可以将以太数转换成子单元(subunits)](https://www.myetherwallet.com/helpers.html)*
+
+你可以把gas limit当作一辆车的汽油单位或者公升或者加仑的数量。可以把gas price当作是汽油单位/公升/加仑的成本。
+
+对于一辆车，每加仑(单位)是2.50美元(价格)。对于以太坊，每个gas(单位)20 GWEI(价格)。为了填满你的“坦克”，需要……- 10 加仑2.50美元的价格 = 25美元 - 21000单位gas20GWEI的价格 = 0.00042 ETH。
+
+因此，总共的交易费用将会是0.00042 以太。
+
+发送代币通常会花费大约50000到100000gas，所以总共的交易费用会增加到0.001ETH -0.002ETH。
+### 什么是“区块gas limit”？
+区块gas limit是一个区块允许的最大的gas数，由此来决定区块中能够填充多少交易。比如，假设我们有五个交易，其中每个交易分别有10,20,30,40,50的gas limit。如果区块gas limit是100,那么最开始的四个交易可以填充进区块中。矿工决定区块中包括哪些交易。不同的矿工可以尝试在区块中包含后两个交易(50+40)，并且他们只有空间来包括地一个交易(10)。如果你尝试包括使用查过现在区块gas limit的gas，就会被网络拒绝，同时你的以太坊客户端也会给你一个“交易超过区块gas limit”的消息。  
+[这个例子来自以太坊StackExchange的“ethers”](https://ethereum.stackexchange.com/questions/7359/are-gas-limit-in-transaction-and-block-gas-limit-different)
+
+[根据ethstats.net，区块gas limit在写这篇文章时是4,712,357gas](https://ethstats.net)，这意味着一个区块中大约可以填充gas limit为21000的交易224个(平均15-20s产生***PRob:产生什么？区块？***)。[协议允许一个区块的矿工在1/1024(0.0976%)的幅度调整区块gas limit](https://www.reddit.com/r/ethereum/comments/6g6tww/there_are_hundreds_or_even_thousands_of_pending/dinzrgq/)。
+#### 谁决定区块gas limit？
+网络上的矿工决定区块gas limit。与区块gas limit可调协议分开的是[大多数客户端默认的挖矿策略设置的最小区块gas limit4,712,388](https://github.com/search?q=org%3Aethereum+4712388&type=Code)。矿工可以选择改变这个值，但是很多人都不会这么做。
+#### 区块gas limit是怎样改变的？
+
