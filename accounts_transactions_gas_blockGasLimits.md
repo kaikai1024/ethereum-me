@@ -1,7 +1,7 @@
 # 以太坊上的账户，交易，GAS，以及区块gas limit   
                                                                     --Hudson Jamesoon
 
-***[原文链接](http://hudsonjameson.com/2017-06-27-accounts-transactions-gas-ethereum/)***
+***[原文链接](http://hudsonjameson.com/2017-06-27-accounts-transactions-gas-ethereum/)***  
 这个文章目的是帮助人们理解以太坊中账户、交易、gas以及矿工在设置区块大小中扮演的角色背后的一些基本的运作方式。错误之处，欢迎指正。
 ## 什么是账户？
 ### EOA vs 合约账户
