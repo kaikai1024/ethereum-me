@@ -21,8 +21,99 @@ the only possibility the code is removed from the blockchain is when a contract 
 ## installing solidity
 remix/node.js/docker/binary packages/source
 ## solidity in depth
-### version pragma
+### layout of a solidity source file
+#### version pragma
 source files can and should be annotated with a so-called version pragma to reject being compiled with furure compiler versions that might inreoduce incompatible changes.
 ### importing other source files
-#### syntax and semantics
+##### syntax and semantics
+solidity supports import statement
+##### paths
+it depends on the compiler how to actually resolve the paths. it can also map to resources discovered via e.g. ipfs,http or git.
+##### use in actual compilers ***??Prob: not understand***
+remapping
+solc/remix
+#### comments
+single-line comments(//) and multi-line comments(/*...*/)are possible.  
+tripple slash(///) or a double asterisk block(/** ... */) should be used directly above function declaration or statements.
+### structure of a contract
+each contract can contain declarations of state variables,functions,fcunction modifiers, events, struct types, and enum types. furthermore, contracts can inherit from other contracts.
+#### state variables
+state cariables are values which are permanently stored in contract storage.
+#### functions
+fucnctions calls can happen internally or externally and have different levels of visibility towards other contracts. 
+#### function modifiers
+function modifiers can be used to amend the semantics of functions in a delcarative way.
+#### events
+events are convenience interfaces with the EVM logging facilities.
+#### structs types
+structs are custom defined types that can group several variables.
+#### enum types
+enums can be used to create custom types with a finite set of values.
+### types
+solidity is a statically typed language,which means that the type of each cariable(state and local) needs to be specified(or at least known) at compile-time.  
+types can interact with each other in expressions containing operators. ***??not understand***
+#### value types
+variables of these types will aways be passed by value.
+##### booleans
+true/false:!,&&,||,==,!=. || and && apply the common short-circuiting rules.
+##### integers
+int/uint: uint8 to uint256; int8 to int256
+- comparisons: evaluate to bool
+- bit operators: &, |, ^, ~
+- arithmetic operators: +, -, unary -. unary +, *, /, %, **, <<, >> ***??unary +/-***
 
+division always truncates, but it does not truncate if both operators are literals(or literal expressions). ***?? what's the literals***
+
+the result of a shift operation is the type of the left operand.
+#### address
+holds a 20 byte value. also have members and serve as a base for all contracts.
+operators:<=, <, ==, !=, >=, and >.
+#### members of address
+* balance and transfer  
+it is possible to query the balance of an address using the property balance and to send Ether(wei) to an address using the transfer function.
+note: if the address is a contract address ,its code(fallback function ***??fallback***) will be executed together with the transfer call if that execution runs out of gas or fails in any way, the Either transfer will be reverted and the current contract sill stop with an exception.
+* send  
+send is the low-level conterpart of transfer. if the execution fails, the current contract will not stop with an exception, but send will return false.  
+warning:in order to make safe Ether transfers , always check the return value of send, use transfer or even better:use a pattern where the recipent withdraws the money. ***??need to discuss*** 
+* call, callcode, delegatecall  
+call is provided which takes an arbitrary number of arguments of any type. these arguments are padded to 32 bytes and concatenated. one exception is the case where the first argument is encoded to exactly bour bytes. in that case,it is not padded to allow the use of function signatures here. ***??why***
+
+call returns a boolean. it is not possible to access the actual data returned(for this we would need to know the encoding and size in advance.) ***??encoding,***
+
+delegatecall: the difference is that only the code of the given address is used, all other aspects(storage,balance)are taken from the current contract.  
+the purpose of delegatecall is to use library code which is stored in another contract. the user has to ensure that the layout of storage in both contracts is suitable for delegatecall to be used ***??why both***  
+callcode was available that did nor=t provide access to the original msg.sender and msg.value values.
+
+all three functions are very low-level functions and should only be used as a last resort as they break the type-safety of solidity.
+* .gas() option is avaliable on all three methods, while the .value() option is not supported for delegratecall.
+note: all contracts inherit the members of address ***??***, so it is possible to query the balance of the current contract using this.balance.
+#### fixed-size byte arrays
+bytes1 ... bytes32. byte is an alias for bytes1.
+operators:
+* comparisons: evaluate to bool
+* bit operators:
+* index access: read-only
+
+memebers: .length: read-only
+#### dynamically-sized byte array
+* bytes: dynamically-sized byte array. not a value type
+* string: dynamically-sized UTF-8-encoded string,not a value type
+
+use bytes for arbitrary-length raw byte data and string for arbitrary-length string(UTF-8) data.
+#### fixed point numbers
+coming soon
+#### address literals
+hexadecimal literals that are between 39 and 41 digits long and do not pass the checksum test produce a warning and are treated as regular rational number literals
+#### rational and integer literals
+integer literals are formed from a sequence of numbers in the range 0-9.Octal literass do not exists in Solidity and leading zeros are invalid.  
+decimal fraction literals are formed by a . with at least one number on one side.  
+scientific notation is also supported, where the base can have fractions while the exponent cannot.  
+number literal expressions retain arbitrary precision until they are converted to a non-literal type. this means that computations do not overflow and divisons do not truncate in number literal expressions.
+
+any operator that can be applied to integers can also be applied to number literal expressions as long as the operands are integers.
+
+note: all number literal expressions(i.e. the expressions that contain only number literals and operators) belongs to number literal types. so the number literal expressions 1 + 2 and 2+1 both belong to the same number literal types for the rationa number three.
+
+warning: division on integer literals used to truncate in earlier versions, but it will now convert into a rational number, i.e. 5/2 is not equal to 2, but to 2.5.
+
+note: number literal expressions are converted into a non-literal type as soon as they are used with non-literal expressions.
