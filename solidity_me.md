@@ -129,4 +129,58 @@ hexademical literals behave like string literals and have the same convertibilit
 enums are one way to create a user-defined type in solidity. they are explicitly convertible to and from all integer types but implicit conversion is not allowed.  
 enums needs at least one member.
 #### function types
+function types come in two flavours - internal and external functions  
+* internal functions can only be used inside the current contract(more specifically, inside the current code unit, which also includes internal library functions and inherited function) because they cannot be executed outside of the context of the current contract. calling an internal function is realized by jumping to its entry label.
+* external function consist of an address and a function signature and they can be passed via and returned form external functions calls. 
+``` 
+function (<parameter types>) {internal|external} [constant] [payable] [returns (<return types>)] 
+```
+in contrast to the parameter types, the return types cannot be empty - if the function type should not return anything, the whole returns part has to be omitted.  
+by default, function types are internal, so the internal keyword can be omitted.
 
+internal: directly by its name, f  
+external: using this.f
+
+if a function type variable is not initialized, calling it will result in an exception. the same happens if you call a function after using delete on it. ***?? initialized? delete?***
+
+if external function types are used outside of the context of solidity, they are treated as the function tyep, which encodes the address followed by the function identifier together ina single bytes24 type.
+
+note that public functions of the current contract can be used both as an internal and as an external function.  
+***?? the example code***  
+the lambda or inline functions are planned but not yet supported.
+### reference types
+#### data location
+every complex type, i.e. *arrays* and *structs*, has an additional annotation, the "data location", about whether it is stored in memory or in storage.
+
+there is a third data location. "calldata", which is a non-modifiable, non-persistent area where function arguments are stored.  
+function parameters(not return parameters) of external functions are forced to "calldata" and behave mostly like memory. ***??not return parameters***
+
+data locations are important because they change how assignments behave: assignments between storage and memory and also to a state variable(even from other state variable) always create an independent copy.  
+***?? example code***
+##### summary
+* forced data location:
+    - parameters(not return) of external functions: calldata
+    - state variables: storage
+* default data location:
+    - parameters(also return) of functions: memory
+    - all other local variables: storage
+#### arrays
+array can have a compile-time fixed size or they can be dynamic
+* for storage array, the element type can be arbitrary(i.e. also other arrays, mappings or structs).
+* for memeory arrays, it cannot be a mapping and has to ban an ABI type if it is an argument of a publicly-visible function. ***??can arrayss or structs? ABI type?***
+
+fixed size: T[k]; dynamic size: T[].  
+example: an array of 5 dynamic arrays of uint is uint[][5](note that the notation is reversed when compared to some other languages). x[2][1]: the secont uint in the third dynamic array. ***??fuck this. whats the meaning***
+
+variables fo type bytes and string are special arrays.
+* a bytes is similar to bytes[], but it is packed tightly in calldata
+* string is equal to bytes but does not allow length or index access(for now)
+
+so bytes should always be perfered over byte[] because it is cheaper.  
+note: string s: bytes(s).length / bytes(s)[7] = 'x'.
+
+it is possible to make arrays public and have solidity create a getter.the numeric index will become a required parameter for the getter. ***?? getter? not understand***
+##### allocating memory arrays
+creating arrays with variable length in memory can be done using the new keywoed. as opposed to storage arrays, it is not possible to resize memory arrays by assigning to the .length member.
+***?? the example code: uint[] memory a = new uint[][7]***
+##### array literals / inline arrays
