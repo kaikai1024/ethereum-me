@@ -7,7 +7,7 @@ the EVM is not a register machine but a stack machine,so all computations are pe
 ***??*** the instruction set of the EVM is kept minimal in order to avoid incorrect implementation which could casue consensus problems. ***get.other nodes need to verification to make a consensus ?? but does node need to run the contract? yes***  
 #### call vs delegatecall vs  callcode
 contracts can call other contracts or send Ether to non-contract accounts by the means of message calls.
-***??why non-contract accounts***  
+***??why non-contract accounts. actually can***  
 - every transaction consists of a top-level message call which in turn can create further message calls.
 - there exists a special variant of a message call, named delegatecall which is identical to a message call apart from the fact that the code at the target address is executed in the context of the calling contract and msg.sender and msg.value do not change their values.  
 This means that a contract can dunamicallu load code from a different address at runtime. Storage,current address and balance still refer to the calling contract, only the code is taken from the called address.
@@ -29,7 +29,8 @@ source files can and should be annotated with a so-called version pragma to reje
 solidity supports import statement
 ##### paths
 it depends on the compiler how to actually resolve the paths. it can also map to resources discovered via e.g. ipfs,http or git.
-##### use in actual compilers ***??Prob: not understand***
+##### use in actual compilers  
+***??Prob: not understand. something about complile path. need to try in code***
 remapping
 solc/remix
 #### comments
@@ -51,7 +52,7 @@ structs are custom defined types that can group several variables.
 enums can be used to create custom types with a finite set of values.
 ### types
 solidity is a statically typed language,which means that the type of each cariable(state and local) needs to be specified(or at least known) at compile-time.  
-types can interact with each other in expressions containing operators. ***??not understand***
+types can interact with each other in expressions containing operators. ***??not understand. still not understand how interact***
 #### value types
 variables of these types will aways be passed by value.
 ##### booleans
@@ -71,22 +72,22 @@ operators:<=, <, ==, !=, >=, and >.
 #### members of address
 * balance and transfer  
 it is possible to query the balance of an address using the property balance and to send Ether(wei) to an address using the transfer function.
-note: if the address is a contract address ,its code(fallback function ***??fallback***) will be executed together with the transfer call if that execution runs out of gas or fails in any way, the Either transfer will be reverted and the current contract sill stop with an exception.
+note: if the address is a contract address ,its code(fallback function ***??fallback. a function not named and if not map other method then call it or receive an Eth***) will be executed together with the transfer call if that execution runs out of gas or fails in any way, the Either transfer will be reverted and the current contract sill stop with an exception.
 * send  
 send is the low-level conterpart of transfer. if the execution fails, the current contract will not stop with an exception, but send will return false.  
-warning:in order to make safe Ether transfers , always check the return value of send, use transfer or even better:use a pattern where the recipent withdraws the money. ***??need to discuss*** 
+warning:in order to make safe Ether transfers , always check the return value of send, use transfer or even better:use a pattern where the recipent withdraws the money. ***??need to discuss. about the contract security*** 
 * call, callcode, delegatecall  
-call is provided which takes an arbitrary number of arguments of any type. these arguments are padded to 32 bytes and concatenated. one exception is the case where the first argument is encoded to exactly bour bytes. in that case,it is not padded to allow the use of function signatures here. ***??why***
+call is provided which takes an arbitrary number of arguments of any type. these arguments are padded to 32 bytes and concatenated. one exception is the case where the first argument is encoded to exactly bour bytes. in that case,it is not padded to allow the use of function signatures here. ***??why. about encoding***
 
 call returns a boolean. it is not possible to access the actual data returned(for this we would need to know the encoding and size in advance.) ***??encoding,***
 
 delegatecall: the difference is that only the code of the given address is used, all other aspects(storage,balance)are taken from the current contract.  
-the purpose of delegatecall is to use library code which is stored in another contract. the user has to ensure that the layout of storage in both contracts is suitable for delegatecall to be used ***??why both***  
+the purpose of delegatecall is to use library code which is stored in another contract. the user has to ensure that the layout of storage in both contracts is suitable for delegatecall to be used ***??why both. about library***  
 callcode was available that did nor=t provide access to the original msg.sender and msg.value values.
 
 all three functions are very low-level functions and should only be used as a last resort as they break the type-safety of solidity.
 * .gas() option is avaliable on all three methods, while the .value() option is not supported for delegratecall.
-note: all contracts inherit the members of address ***??***, so it is possible to query the balance of the current contract using this.balance.
+note: all contracts inherit the members of address ***??. about the meaning***, so it is possible to query the balance of the current contract using this.balance.
 #### fixed-size byte arrays
 bytes1 ... bytes32. byte is an alias for bytes1.
 operators:
@@ -116,4 +117,16 @@ note: all number literal expressions(i.e. the expressions that contain only numb
 
 warning: division on integer literals used to truncate in earlier versions, but it will now convert into a rational number, i.e. 5/2 is not equal to 2, but to 2.5.
 
-note: number literal expressions are converted into a non-literal type as soon as they are used with non-literal expressions.
+note: number literal expressions are converted into a non-literal type as soon as they are used with non-literal expressions. ***??still prob about literal. understand but how to translate***
+
+#### string literals
+they don't imply trailing zeroes as in C; "foo" represents three bytes not four.  
+string literals support escape characters.
+#### hexadecimal literals
+hex"001122FF",  
+hexademical literals behave like string literals and have the same convertibility restrictions.
+#### enums
+enums are one way to create a user-defined type in solidity. they are explicitly convertible to and from all integer types but implicit conversion is not allowed.  
+enums needs at least one member.
+#### function types
+
