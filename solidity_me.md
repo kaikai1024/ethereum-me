@@ -296,4 +296,30 @@ message to non-existing contracts are more expensive. ***??oh***
 * this: the current contract, explicilty convertible to Address
 * selfdestruct(address recipient)
 ### expressions and control structures
+#### input parameters and output parameters
+##### input parameters
+the input parameters are declared the same way as variables are. 
+##### output parameters
+the output parameters can be declared with the same syntax after the returns keywords.
 
+the name of output parameters can be omitted. the output values can also be specified using return statements.  
+the rerurn statements are also capable of returning multiple values.
+#### control structure
+most of the control structures from jacascript are available except for switch and goto.  
+parentheses can not be omitted for conditionals.  
+note: there is no type conversion from non-boolean to boolean types as there is in C and JavaScript
+##### returning multiple values
+when a function has multiple output parameters, return (v0, v1, ..., vn) can return multiple values
+#### function calls
+##### internal function calls
+these function calls are translated into simple jumps inside the EVM.  
+only functions of the same contract can be called internally.
+##### external function calls
+via a message call and not directly via jumps.  
+note: function calls on this cannot be used in the constructors, as the actual contract has not been created yet.
+
+for an external call, all function arguments have to be copied to memory.
+* .value()
+* .gas()
+
+note: the expression InfoFeed(addr) performs an explicit type conversion stating that "we know that the type of the contract at the given address is InfoFeed" and this does not execute a constructor.
