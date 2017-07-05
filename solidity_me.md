@@ -184,3 +184,116 @@ it is possible to make arrays public and have solidity create a getter.the numer
 creating arrays with variable length in memory can be done using the new keywoed. as opposed to storage arrays, it is not possible to resize memory arrays by assigning to the .length member.
 ***?? the example code: uint[] memory a = new uint[][7]***
 ##### array literals / inline arrays
+array literals are arrays that are written as an expression and are not assigned to a variable right away.
+note: currently,fixed size memory arrays cannot be assigned to dynamically-sized memory arrays.
+##### members
+* length: the size of memory arrays is fixed(but dynamic, i.e. it can depend on runtime parameters) once they are created.
+* push: dynamic storage arrays and bytes. the function returns the new length.
+
+warning: it is not yet possible to use arrays of arrays in external functions.
+warning: due to limitations of the EVM, it is not possible to return dynamic content from external function calls. 
+```
+contract C { function f() returns (uint[]) { ... } }
+```
+will return something if called from web3.js, but not if called from Solidity. ***?? what***  
+the only workaround for now is to use large statically-sized arrays statically-sized arrays.
+#### struct
+a new way to define new types in the form of structs.  
+struct types can be used inside mapping and arrays and they can itself contain mapping and arrays.  
+it is not possible for a struct to contain a member of its own type,although the struct itself can be the value type of a mapping member. as the size of the struct has to be finite.
+
+note: how in all the functions, a struct type is assigned to a local variable(of default storage data location). this does not copy the struct but only stores a reference so that assignments to members of the local cariable actually write to the state.
+### mappings
+mapping types are declared as mapping(_KeyType => _ValueType).  
+* _KeyType: almost any type except for a mapping, a dynamically sized array. a contract, an enum and a struct.
+* _ValueType: any type. including mappings.
+
+mapping can be seen as hash tables which are virtually initialized such that every possible key exists and is mapped to a value whose byte-representation is all zeros: a type's default value.
+
+mapping are only allowed for state variables(or as storage reference types in internal functions)
+
+it is possible to mark mappings public and have solidity create a getter. ***?? still getter. but a little understand***  
+### operators involving LValues
+LValue: avariable or something that can be assigned to.  
++=, ++, -- something like that.
+#### delete
+delete a assigns the initial value for the type to a.  
+delete has no effect on whole mappings(as the keys of mappings may be arbitrary and are generally unknown)  
+note: behaves like an assignment to a, i.e. it stores a new object in a.
+### conversions between elementary types
+#### implicit conversions
+in general, an implicit conversion between value-types is possible if it makes sense semantically and no information is lost.
+#### explicit conversions
+be care
+### type deduction
+using var is not possible for function parameters or return parameters.
+warning: the type is noly reduced from the first assignment, so the loop in the following snippet is infinite, as i will have the type uint8 and any value of this type is smaller than 2000. ***?? why***
+```
+for (var i = 0; i < 2000; i++) { ... }
+```
+### units and globally avaliable variables
+#### Ether units
+wei, finney, szabo, ether. 2 ether == 2000 finney evaluates to true.
+### time units
+* 1 == 1 seconds
+* 1 minutes == 60 seconds
+* other: minutes, hours, days, weeks, years
+
+due to the fact that leap seconds cannot be predicted, an exact calendat library has to be updated by an external oracle. ***??oracle. later to learn***
+
+these suffixes cannnot be applied to variables.
+```
+function f(uint start, uint daysAfter) {
+    if (now >= start + dayAfter * 1 days) { ... }
+}
+```
+#### special variables and functions
+##### block and transaction properities
+* block.blockhash(uint blockNUmber) returns (bytes32)
+* block.coinbase (address)
+* block.difficulty (uint)
+* block.gaslimit (uint)
+* block.number (uint)
+* block.timestamp (uint)
+* msg.data (bytes)
+* msg.gas (uint)
+* msg.sender (address)
+* msg.sig (bytes4)
+* msg.value (uint)
+* now (uint)
+* tx.gasprise (uint)
+* tx.origin (address)
+
+note:
+* the value of all members of msg, including msg.sender and msg.value can change for every external function call. this includes calls to library functions.
+* if you want to implement access restrictions in library functions using msg.sender, you have to manually supply the value of msg.sender as an argument. ***??what***
+* the block  hashes are not avaliables for all blocks for scalability reasons. you can only access the hashes of the most recent 256 blocks, all other values will be zero.
+##### error handing
+* assert(bool condition)
+* require(bool condition)
+* revert() ***?? oh***
+##### mathematical and cryptographic functions
+* addmod(uint x, uint y, uint k) returns (uint): (x + y) % k
+* mulmod(uint x, uint y, uint k) returns (uint): (x * y) % k
+* keccak256(...) returns (bytes32)
+* sha3(...) returns (bytes32)
+* sha256(...) returns(bytes32)
+* ripemd160(...) returns(bytes32)
+* ecrecover(bytes32 hash, uint8 v, bytes32 r, bytes32 s) returns (address)
+
+tightly packed: the arguments are concatenated without padding. 
+
+message to non-existing contracts are more expensive. ***??oh***
+##### address related
+* <address>.balance (uint256)
+* <address>.transfer(uint256 amount)
+* <address>.send(uint256 amount) returns (bool)
+* <address>.call(...) returns (bool)
+* <address>.callcode(...) returns (bool)
+* <address>.delegatecall(...) returns (bool)
+
+##### contract related
+* this: the current contract, explicilty convertible to Address
+* selfdestruct(address recipient)
+### expressions and control structures
+
