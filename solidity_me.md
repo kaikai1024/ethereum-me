@@ -577,3 +577,185 @@ loops that do not have a fixed number of iterations, for example, loops that dep
 #### sending and receiving Ether
 * contracts can react on and reject a regular transfer, but there are ways to move Ether without creating a message call. one way is to simply "mine to" and contract address and the second way is using selfdestruct(x) ***?? mine to?***
 * if a contract receives Ether(without a function being called), the fallback function is executed. during the execution of the fallback function, the contract can only rely on the "gas stipend"(2300 gas) being aviliable to it at that time.
+* there is a way to forward more gas to the receiving contract using addr.call.value(x)(). this is essentially the same as addr.transfer(x), only that it forwards all remaining gas and opens up the ability for the recipient to perform more expensive actions.
+* if you want to send Ether using assress.transfer, there are certain details to be aware of:
+    - if the recipent is a contract, it causes its fallback function to be executed which can , inturn , call back the sending contrack.
+    - sending ether can fail due to the call depth going above 1024, since the caller is in total control of the call depth, they can force the transfer to fail.
+    - sending ether can also fail because the execution fo the recipient contract requires more than the allotted amount of gas
+#### callstack depth
+external function calls can fail any time because they exceed the maximum call stack of 1024.
+#### tx.origin
+never use tx.origin for authorization.
+#### minor details
+* in for (var i = 0; i  arrayNmae.length; i++) { ... }, the type of i will be uint8
+* the constant keyword for functions is currently not enforced by the compiler.
+* types that do not occupy the full 32 bytes might contain "dirty higher order bits"
+### recommendations
+#### restrict the amount of ether
+restrict the amount of Ether(or other tokens) that can be stored in a smart contract.
+#### keep it small and modular
+keep your contracts small and easily understand. single out unrelated functionality in other contracts or into libraries.
+#### use the checks-effects-interaction pattern
+most functions will first perform some checks. these checks should be done first.  
+second, effects to the state variables fo the current contract should be made.  
+interaction with other contracts should be the very last step in any function.
+
+note: calls to known contracts might in turn cause calls to unknown contracts, so it is pobably better to just always apply this patten.
+#### include a fail-safe mode
+you can add a function in your smart contract that performs some self-checks like "has any ether leaked?" "is the sum of the tokens equal to the balance of the contract".
+
+keep in mind that you cannot use too much gas for that, so help through off-chain computations might be needed there. ***??like how***
+### formal verfification
+## using the compiler
+### using the commandline compiler
+### compiler input and putput JSON description
+## application binary interface specification
+### basic design
+the application binary interface is the standard way to interact with contracts in the ethereum ecosystem, both from outside the blockchain and for contract-to-contract interaction.
+### function selector
+the first four bytes of the call data for a function call specifies the function to be called.
+### argument encoding
+starting form the fifth byte, the encoded argument follow
+### types
+### formal specification of the encoding
+we distinguish static and dynamic types, static types are encoded in-place and dynamic types are encoded at a separately allocated location after the current block. ***??read quickly***
+### function selector and argument encoding
+### examples
+### use of dynamic types
+### events
+given an event name and series of event parameters, we split them into two sub-series: those which are indexed and those which are not.
+### json
+the json format for a contract's interface is given by an array of function and/or event descriptions
+## style guide
+### introduction
+taken from python's pep8 style guide
+### code layout
+#### indentation
+use 4 spaces per indentation level
+#### tabs or spaces
+spaces are the preferred indentation method
+#### blank lines
+surround top level declarations in solidity source with two blank lines  
+within a contract surround function declarations with a single blank line
+#### source file encoding
+UTF_8 or ASCII encoding is preferred
+#### imports
+imports statement should always be places at the top of the file.
+#### order of functions
+* constructor
+* fallback function(if exists)
+* external
+* public
+* internal
+* private
+
+within a grouping, place the constant functions last.
+#### whitespace in expressions
+more than one space around an assignment or other operator to align with another.
+#### control structures
+* open on the same line as the declaration
+* close on their own line at the same indentation level as the beginning of the declaration
+* the opening brace should be proceeded by a single space
+#### function declaration
+for long function declarations, it is recommended to drop each argument onto it's own line at the same indentation level as the function body.
+#### mappings
+#### variable declarations
+declarations of array variables should not have a space between the type and the brackets.
+#### other recommendations
+strings should be quoted with double-quotes instead of single-quotes
+### naming conventions
+#### naming styles
+#### names to avoid
+#### contract and library names
+contracts and libraries should be named using the capwords style
+#### events
+should be named using the capwords style
+#### functions names
+mixedCase
+#### functions arguments
+self
+#### local and state variables
+mixedCase
+#### constants
+all capital letters
+#### modifiers
+mixedCase
+#### avoiding collisions
+#### general recommendations
+## common patterns
+### withdrawal from contracts
+the recommended method of sending funds after an effect is using the withdrawal pattern.
+### restricting access
+restricting access is a common pattern for contracts.
+you can make it a bit harder by using encryption, but if your contract is supposed to read the data, so will everyone else.
+
+you can restrict read access to your contract's state by other contracts.
+
+you can restrict who can make modifications to your contract's state or call your contract's functions.
+***?? read the example quickly***
+### state machine
+contracts often act as a state machine, which means that they have certain stages in which they behave differently or in which different functions can be called
+
+a function call often ends a stage and transitions the contract into the next stage
+
+it is also common that some stages are automatically reached at a certain point in time.
+#### example
+atStage/timeTransitions/transitionNext ***?? read the example quickly***
+## list of known bugs
+## conntributing
+### how to repoort issues
+### workflow for pull requests
+### running the compiler tests
+### whiskers
+## frequently asked questions
+### basic questions
+#### example contracts
+#### create and publish the most basic contract possible
+#### is it possible to do something on a specific block numver?(e.g. publish a contract or execute a transaction)
+#### what is the transaction "payload"?
+#### is there  adecompiler available?
+#### create a contract that can be killed and return funds?
+#### store Ether in a contract
+#### use a non-constant function(req sendTransaction) to increment a variable in acontract.
+#### can you return an array or astring from a solidity function call?
+#### how do you represent double/float in solidity?
+#### is it possible to in-line initialize an array like so: string[] myarray = ["a", "b"];
+#### are timestamps(now, block.timestamp) reliable?
+#### can a contract function return a struct?
+#### if i return an enum, i only get integer values in web3.js. how to get the named value?
+#### what is the deal with function () { ... } inside solidity contracts? how can a function not have a name?
+#### is it possible to pass arguments to the fallback function?
+#### can state variables be initialized in-line?
+#### how do structs work?
+#### how do for loops work?
+#### what character set does solidity use?
+#### what are some examples of basic string manipulation(substring, indexOf, charAt, etc)?
+#### can i concatenate two strings?
+#### why is the low-level function .call() less favorable than instantiating a contract with a variable(ContractB b;) and executing its functions(b.doSonmething();)
+#### is unused gas automatically refunded?
+#### when returning a value of say uint type, is it possible to return an undefined or "null"-like value?
+#### are comments included with deployed contracts and do they increase deployment gas?
+#### what happens if you send ether along with a function call to a contract?
+#### is it possible to get a tx receipt for a transaction executed contract-to-contract?
+#### waht is the memory keyword? what does it do?
+#### what is difference between bytes and byte[]?
+#### is it possible to send a value while calling an overloaded function?
+### advanced questions
+#### how do you get a randon number in a contract?(implement a self-returning gambling contract.)
+#### get return value form non-constant function from another contract
+#### get contract to do something when it is first mined
+#### how do you create 2-dimensional arrays
+#### what does p.recipient.call.value(p.amount)(p.data) do?
+#### what happens to a struct's mapping when copying over a struct?
+#### how di i initialize a contract with only a specific amount of wei?
+#### can a contract function accept a two-dimensional array?
+#### what is the relationship between bytes32 and string? why is it that bytes32 somevar = "stringliteral"; works and what does the saved 32-byte hex value mean?
+#### can a contract pass an array(struct size) or string or bytes(dynamic size) to another contract?
+#### sometimes, when i try to change the length of an array with ex: arrayname.length = 7; i get a compiler error Value must be an lvalue. WHY?
+#### is it possible to return an array of strings(string[]) from a solidity function?
+#### if you issue a call for an array, it is possible to retrieve the whole array? or must you write a helper function for that?
+#### what could have happened if an account has storage value(s) but no code?
+#### what does the following sttrange check do in the custom token contract?
+#### more questions?
+# done
+
